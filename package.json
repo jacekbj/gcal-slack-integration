@@ -1,0 +1,28 @@
+{
+  "name": "slack-gcal-intergration",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "Jacek Bronski-Jankowski <jacek.j.jankowski@gmail.com>",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "deploy:calendar-check": "gcloud functions deploy calendarCheck --region europe-west1 --runtime nodejs10 --trigger-topic cron",
+    "deploy:google-oauth-callback": "gcloud functions deploy googleOauthCallback --region europe-west1 --runtime nodejs10 --trigger-http",
+    "deploy:slack-oauth-callback": "gcloud functions deploy slackOauthCallback --region europe-west1 --runtime nodejs10 --trigger-http",
+    "deploy:slack-actions": "gcloud functions deploy slackActions --region europe-west1 --runtime nodejs10 --trigger-http",
+    "deploy": "concurrently \"yarn:deploy:*\"",
+    "deploy-scheduler": "gcloud scheduler jobs create pubsub gcal-slack-cron --schedule \"* * * * *\" --topic=cron --message-body \"Run\"",
+    "deploy-pubsub": "gcloud pubsub topics create gcal-slack-cron"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^2.3.0",
+    "date-fns": "^2.2.1",
+    "googleapis": "^43.0.0",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.2"
+  }
+}
